@@ -35,7 +35,7 @@ class Station(Producer):
         # replicas
         #
         #
-        topic_name = f"{station_name}_station"
+        topic_name = f"org.chicago.cta.station.arrivals.{station_name}"
         super().__init__(
             topic_name,
             key_schema=Station.key_schema,
@@ -57,6 +57,7 @@ class Station(Producer):
         """Simulates train arrivals at this station"""
         logger.info(f"Train_ID: {train.train_id}, Direction: {direction}, Prev_Station_id: {prev_station_id}, "
                     f"Prev_Direction: {prev_direction}")
+
         value_dict = {"train_id": train.train_id,
                       "direction": direction,
                       "station_id": self.station_id,

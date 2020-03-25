@@ -21,16 +21,25 @@ KSQL_URL = "http://localhost:8088"
 #       Make sure to cast the COUNT of station id to `count`
 #       Make sure to set the value format to JSON
 
+# topic: com.udacity.turnstiles
+
 KSQL_STATEMENT = """
 CREATE TABLE turnstile (
-    ???
+    station_id INT,
+    station_name VARCHAR,
+    line VARCHAR
 ) WITH (
-    ???
+    KAFKA_TOPIC = 'org.chicago.cta.turnstiles',
+    VALUE_FORMAT = 'AVRO',
+    KEY = 'station_id'
 );
 
 CREATE TABLE turnstile_summary
-WITH (???) AS
-    ???
+WITH (VALUE_FORMAT = 'JSON') AS
+    SELECT station_id, 
+    COUNT(station_id) AS count
+    FROM turnstile
+    GROUP BY station_id;
 """
 
 

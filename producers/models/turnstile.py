@@ -27,7 +27,7 @@ class Turnstile(Producer):
         )
 
         super().__init__(
-            f"{station_name}_turnstile",
+            "org.chicago.cta.turnstiles",  # in ksql.py only one turnstile topic is requested
             key_schema=Turnstile.key_schema,
             value_schema=Turnstile.value_schema,
             num_partitions=1,
@@ -39,21 +39,17 @@ class Turnstile(Producer):
     def run(self, timestamp, time_step):
         """Simulates riders entering through the turnstile."""
         num_entries = self.turnstile_hardware.get_entries(timestamp, time_step)
-        logger.info(f"turnstile kafka with timestamp {int(timestamp.timestamp())} and time_step {time_step} and "
+        logger.debug(f"turnstile kafka with timestamp {int(timestamp.timestamp())} and time_step {time_step} and "
                     f"num_entries {num_entries}")
-        #
-        #
-        # TODO: Complete this function by emitting a message to the turnstile topic for the number
-        # of entries that were calculated - makes no sense
-        #
-        #
+
         value_dict = {
             "station_id": self.station.station_id,
             "station_name": self.station.name,
-            "line": self.station.color.name
+            "line": self.station.color.name,
+            "entries": num_entries
         }
         self.producer.produce(
             topic=self.topic_name,
-            key={"timestamp": int(timestamp.timestamp())},
+            key={"timestamp": self.time_millis()},
             value=value_dict
         )
